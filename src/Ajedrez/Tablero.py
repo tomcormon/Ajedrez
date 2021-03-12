@@ -7,6 +7,7 @@ from numpy import inf
 class Tablero:
     W = True  # Representa blanco
     D = False  # Representa negro
+
     king = 'king'
     queen = 'queen'
     bishop_king = 'bishop_king'
@@ -93,6 +94,14 @@ class Tablero:
 
 
 class Casilla:
+    up = "U"
+    down = "D"
+    left = "L"
+    right = "R"
+    up_right = "UR"
+    up_left = "UL"
+    down_right = "DR"
+    down_left = "DL"
 
     def __init__(self, nombre, posicion, ocupacion, tablero: Tablero):
         self.nombre = nombre
@@ -111,14 +120,14 @@ class Casilla:
 
     def llenar_casillas_adyacentes(self):
         dic = {}
-        dic["U"] = self.check_candidato((self.posicion[0], self.posicion[1] + 1))
-        dic["D"] = self.check_candidato((self.posicion[0], self.posicion[1] - 1))
-        dic["L"] = self.check_candidato((self.posicion[0] - 1, self.posicion[1]))
-        dic["R"] = self.check_candidato((self.posicion[0] + 1, self.posicion[1]))
-        dic["UR"] = self.check_candidato((self.posicion[0] + 1, self.posicion[1] + 1))
-        dic["UL"] = self.check_candidato((self.posicion[0] - 1, self.posicion[1] + 1))
-        dic["DR"] = self.check_candidato((self.posicion[0] + 1, self.posicion[1] - 1))
-        dic["DL"] = self.check_candidato((self.posicion[0] - 1, self.posicion[1] - 1))
+        dic[self.up] = self.check_candidato((self.posicion[0], self.posicion[1] + 1))
+        dic[self.down] = self.check_candidato((self.posicion[0], self.posicion[1] - 1))
+        dic[self.left] = self.check_candidato((self.posicion[0] - 1, self.posicion[1]))
+        dic[self.right] = self.check_candidato((self.posicion[0] + 1, self.posicion[1]))
+        dic[self.up_right] = self.check_candidato((self.posicion[0] + 1, self.posicion[1] + 1))
+        dic[self.up_left] = self.check_candidato((self.posicion[0] - 1, self.posicion[1] + 1))
+        dic[self.down_right] = self.check_candidato((self.posicion[0] + 1, self.posicion[1] - 1))
+        dic[self.down_left] = self.check_candidato((self.posicion[0] - 1, self.posicion[1] - 1))
         self.casillas_adyacentes = dic
 
     def cassilla_dir(self, direccion):
@@ -159,7 +168,6 @@ class Ficha:
         list
             The list with the attacked squares.
         """
-        # Devuelve una lista de las casillas atacadas por la pieza
         ...
 
     def informar_a_las_casillas_que_estan_atacadas(self):
@@ -202,6 +210,7 @@ class King(Ficha):
                 cas_ata.append(i)
         return cas_ata
 
+
 class Bichop(Ficha):
     def __init__(self, color, casilla):
         super().__init__(color, casilla, tipo="rook", valor=5)
@@ -232,6 +241,7 @@ class Bichop(Ficha):
                         pos_jug.append(casilla_variable)
                 casilla_variable = casilla_variable.cassilla_dir(i)
         return pos_jug
+
 
 class Rook(Ficha):
     def __init__(self, color, casilla):
@@ -294,3 +304,4 @@ class Queen(Ficha):
                         pos_jug.append(casilla_variable)
                 casilla_variable = casilla_variable.cassilla_dir(i)
         return pos_jug
+
