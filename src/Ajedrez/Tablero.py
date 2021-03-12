@@ -1,133 +1,169 @@
-from Ajedrez.Ficha import *
-from Ajedrez.Casilla import *
-
-global dic_nl, dic_ln
-
-dic_nl = {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f", 7: "g", 8: "h"}
-dic_ln = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
+from itertools import product
+from numpy import inf
 
 
-class Tablero(object):
+class Tablero:
+    W = True  # Representa blanco
+    D = False  # Representa negro
+    King = "King"
+
     def __init__(self):
-        self.casillas = {}
-        self.fichas = {}
+        self.casillas = {(m, n): Casilla(nombre=Tablero.dar_nombre((m, n)),
+                                         posicion=(m, n),
+                                         ocupacion=None,
+                                         tablero=self) for m in range(1, 9) for n in range(1, 9)}
+        for c in self.casillas.values():
+            c.llenar_casillas_adyacentes()
+
+        self.fichas = {Tablero.W: {}, Tablero.D: {}}
+
+        # fichas blancas:
+        self.fichas[Tablero.W][Tablero.King] = Rey(Tablero.W, self.casillas[(5, 1)])
+
+        # fichas negras:
+        self.fichas[Tablero.D][Tablero.King] = Rey(Tablero.D, self.casillas[(5, 8)])
+
+        for i in [Tablero.W, Tablero.D]:
+            for j in self.fichas[i].values():
+                j.informar_a_las_casillas_que_estan_atacadas()
+
+    @staticmethod
+    def dar_nombre(posicion):
+        """
+        returns the name of a given position.
+
+        Parameters
+        ----------
+        posicion: tuple
+            the position for returning the name.
+
+        Returns
+        -------
+        str
+           The name.
+
+        """
         dic_nl = {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f", 7: "g", 8: "h"}
+        i, j = posicion
+        return f"{dic_nl[i]}{j}"
+
+    @staticmethod
+    def dar_posicion(nombre):
         dic_ln = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
-
-        casillas = []
-        for m in lista_1_al_n(8):
-            for n in lista_1_al_n(8):
-                casillas.append([m, n])
-        casillas_posicion = []
-        casillas_posicion += casillas
-
-        casillasLetra = []
-        for m in lista_1_al_n(8):
-            for n in lista_1_al_n(8):
-                casillasLetra.append([dic_nl[m], n])
-        casillas_nombres = []
-        for i in casillasLetra:
-            casillas_nombres.append(str(i[0]) + str(i[1]))
-
-        self.agregar_casillas(ldldl)
-
-    def agregar_casillas(self, lista_nombre, lista_casilla):
-        '''toma una lista de casillas (obj) y una lista de nombres (str como h7) y los asigna respectivamente en un diccionario'''
-        for i in lista_1_al_n(len(lista_nombre)):
-            self.casillas[lista_nombre[i - 1]] = lista_casilla[i - 1]
+        n, i = tuple(nombre)
+        i = int(i)
+        return (dic_ln[n], i)
 
     def mostrar_casillas(self):
-        for i in casillas_nombres:
-            print(self.casillas[i].nombre, self.casillas[i].posicion, self.casillas[i].ocupacion)
-
-    def mostrar_casilla(self, nombre):
-        print(self.casillas[nombre].nombre, self.casillas[nombre].posicion, self.casillas[nombre].ocupacion)
-
-    def revisar_si_casilla_esta_en_tablero(self, casilla):
-        '''recibe objeto casilla devuelve True o False'''
-        for i in self.casillas.values():
-            if casilla == i:
-                return casilla == i
-        for i in self.casillas.values():
-            if casilla == i:
-                return casilla == i
-            else:
-                return False
+        for c in self.casillas.values():
+            print(c)
 
     def revisar_si_posicion_esta_en_tablero(self, posicion):
-        posiciones = []
-
-        for i in self.casillas.values():
-            posiciones.append(i.posicion)
-
-        for i in posiciones:
-            if posicion == i:
-                return True
-        for i in posiciones:
-            if posicion == i:
-                return True
-            else:
-                return False
-
-    def casillas_adyacentes(self, casilla):
-        casillas_adyacentes_posiciones = []
-        cascasillas_adyacentes_posiciones_en_tablero = []
-        casillas_adyacentes_nombres = []
-        casillas_adyacentes_objetos = []
-
-        for i in direcciones:
-            casillas_adyacentes_posiciones.append(self.casillas[casilla].casilla_adyacente(i))
-
-        for i in casillas_adyacentes_posiciones:
-            if self.revisar_si_posicion_esta_en_tablero(i) == True:
-                cascasillas_adyacentes_posiciones_en_tablero.append(i)
-
-        for i in cascasillas_adyacentes_posiciones_en_tablero:
-            casillas_adyacentes_nombres.append(str(dic_nl[i[0]]) + str(i[1]))
-
-        for i in casillas_adyacentes_nombres:
-            casillas_adyacentes_objetos.append(self.casillas[i])
-        return casillas_adyacentes_objetos
-
-    def cruz(self, casilla):
-        casillas_cruz_posiciones = []
-        cascasillas_cruz_posiciones_en_tablero = []
-        casillas_cruz_nombres = []
-        casillas_cruz_objetos = []
-
-        posicion_variable = []
-        posicion_variable += self.casillas[casilla].posicion
-
-        for i in ["U", "D", "L", "R"]:
-            T = 0
-            if self.revisar_si_posicion_esta_en_tablero(posicion_variable) == False:
-                posicion_variable = []
-                print(posicion_variable)
-                posicion_variable += self.casillas[casilla].posicion
-                print(posicion_variable)
-
-            while self.revisar_si_posicion_esta_en_tablero(posicion_variable) == True and T < 100:
-                posicion_variable = casilla_adyacente_posicion_posicion(posicion_variable, i)
-                if self.revisar_si_posicion_esta_en_tablero(posicion_variable) == True:
-                    cascasillas_cruz_posiciones_en_tablero.append(
-                        casilla_adyacente_posicion_posicion(posicion_variable, i))
-
-                T += 1
-                print(posicion_variable)
-                print(cascasillas_cruz_posiciones_en_tablero)
-
-        for i in cascasillas_cruz_posiciones_en_tablero:
-            casillas_cruz_nombres.append(str(dic_nl[i[0]]) + str(i[1]))
-
-        for i in casillas_cruz_nombres:
-            casillas_cruz_objetos.append(self.casillas[i])
-        return casillas_cruz_objetos
-
-    def equis(self, casilla):
-        pass
-
-    def circulo_caballo(self, casilla):
-        pass
+        return posicion in self.casillas.keys()
 
 
+class Casilla:
 
+    def __init__(self, nombre, posicion, ocupacion, tablero: Tablero):
+        self.nombre = nombre
+        self.posicion = posicion
+        self.ocupacion = ocupacion
+        self.tablero = tablero
+        self.casillas_adyacentes = {}
+        self.atacado = {Tablero.W: False, Tablero.D: False}
+
+    def __repr__(self):
+        return f"nombre: {self.nombre}, posicion:{self.posicion}, ficha:{self.ocupacion}"
+
+    def check_candidato(self, candidato):
+        if candidato in self.tablero.casillas.keys():
+            return self.tablero.casillas[candidato]
+
+    def llenar_casillas_adyacentes(self):
+        dic = {}
+        dic["U"] = self.check_candidato((self.posicion[0], self.posicion[1] + 1))
+        dic["D"] = self.check_candidato((self.posicion[0], self.posicion[1] - 1))
+        dic["L"] = self.check_candidato((self.posicion[0] - 1, self.posicion[1]))
+        dic["R"] = self.check_candidato((self.posicion[0] + 1, self.posicion[1]))
+        dic["UR"] = self.check_candidato((self.posicion[0] + 1, self.posicion[1] + 1))
+        dic["UL"] = self.check_candidato((self.posicion[0] - 1, self.posicion[1] + 1))
+        dic["DR"] = self.check_candidato((self.posicion[0] + 1, self.posicion[1] - 1))
+        dic["DL"] = self.check_candidato((self.posicion[0] - 1, self.posicion[1] - 1))
+        self.casillas_adyacentes = dic
+
+    def cassilla_dir(self, direccion):
+        return self.casilla_adyacentes[direccion]
+
+
+class Ficha:
+    def __init__(self, color, casilla: Casilla, tipo, valor):
+        self.color = color
+        self.casilla = casilla
+        self.tipo = tipo
+        self.valor = valor
+        self.posibles_jugadas = self.posibles_jugadas()
+
+    def __repr__(self):
+        col = "Negro"
+        if self.color:
+            col = "Blanco"
+        return f"{self.tipo} {col}, posicion:{self.casilla.nombre}"
+
+    def posibles_jugadas(self):
+        """
+
+        Returns
+        -------
+
+        """
+
+        ...
+
+    def casillas_atacadas(self):
+        """
+        Computes the list of attacked squares.
+
+        Returns
+        -------
+        list
+            The list with the attacked squares.
+        """
+        # Devuelve una lista de las casillas atacadas por la pieza
+        ...
+
+    def informar_a_las_casillas_que_estan_atacadas(self):
+        if self.casillas_atacadas() is not None:
+            for i in self.casillas_atacadas():
+                i.atacado[self.color] = True
+
+    def posibles_capturas(self):
+        ...
+
+    def ataques_indirectos(self):
+        ...
+
+    def posibles_jaques(self):
+        ...
+
+
+class Rey(Ficha):
+    def __init__(self, color, casilla):
+        super().__init__(color, casilla, tipo="Rey", valor=inf)
+
+    def posibles_jugadas(self):
+        pos_jug = []
+        for i in self.casilla.casillas_adyacentes.values():
+            if i is not None:
+                if not i.atacado[not self.color]:
+                    if i.ocupacion is None:
+                        pos_jug.append(i)
+                    elif i.ocupacion.color != self.color:
+                        pos_jug.append(i)
+        return pos_jug
+
+    def casillas_atacadas(self):
+        cas_ata = []
+        for i in self.casilla.casillas_adyacentes.values():
+            if i is not None:
+                cas_ata.append(i)
+        return cas_ata

@@ -1,17 +1,15 @@
-from Ajedrez.Tablero import *
-from Ajedrez.Ficha import *
-from Ajedrez.Casilla import *
+import Ajedrez
+from Ajedrez.Tablero import Tablero, Casilla, Ficha
 
 
-def test_ficha():
-    pass
+mi_tablero=Tablero()
+mi_tablero.mostrar_casillas()
+
+for i in mi_tablero.casillas.values():
+    print(i.nombre, i.atacado[True], i.atacado[False])
 
 
-def test_ficha():
-    pass
-
-# mi_tablero=tablero()
-# mi_tablero.agregar_casillas(casillas_nombres,casillas_como_objetos)
-# mi_tablero.mostrar_casillas()
-
-# print(mi_tablero.cruz("a1"))
+for i in [Ajedrez.Tablero.Tablero.D, Ajedrez.Tablero.Tablero.W]:
+    for j in mi_tablero.fichas[i].values():
+        print(j)
+        print(j.casillas_atacadas())

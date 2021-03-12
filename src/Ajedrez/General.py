@@ -1,4 +1,4 @@
-
+global dic_nl, dic_ln, lista_1_al_n
 
 def lista_1_al_n(n):
 	i=1
@@ -7,10 +7,9 @@ def lista_1_al_n(n):
 		L.append(i)
 		i+=1
 	return L
+dic_nl = {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f", 7: "g", 8: "h"}
+dic_ln = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
 
-"""se crean casillas como parejas [letra, numero]"""
-dic_nl={1:"a",2:"b",3:"c",4:"d",5:"e",6:"f",7:"g",8:"h"}
-dic_ln={'a':1,'b':2,'c':3,'d':4,'e':5,'f':6,'g':7,'h':8}
 
 
 casillas=[]
@@ -160,9 +159,9 @@ class tablero(object):
 
 	def mostrar_casillas(self):
 		for i in casillas_nombres:
-			print(self.casillas[i].nombre,self.casillas[i].posicion,self.casillas[i].ocupacion)
+			print(self.casillas[i].nombre, self.casillas[i].casilla, self.casillas[i].ocupacion)
 	def mostrar_casilla(self, nombre):
-		print(self.casillas[nombre].nombre,self.casillas[nombre].posicion,self.casillas[nombre].ocupacion)
+		print(self.casillas[nombre].nombre, self.casillas[nombre].casilla, self.casillas[nombre].ocupacion)
 
 	def revisar_si_casilla_esta_en_tablero(self, casilla):
 		'''recibe objeto casilla devuelve True o False'''
@@ -178,7 +177,7 @@ class tablero(object):
 		posiciones=[]
 
 		for i in self.casillas.values():
-			posiciones.append(i.posicion)
+			posiciones.append(i.casilla)
 
 		for i in posiciones:
 			if posicion==i:
@@ -216,7 +215,7 @@ class tablero(object):
 		casillas_cruz_objetos=[]
 
 		posicion_variable=[]
-		posicion_variable+=self.casillas[casilla].posicion
+		posicion_variable+=self.casillas[casilla].casilla
 
 
 		for i in ["U","D","L","R"]:
@@ -224,7 +223,7 @@ class tablero(object):
 			if self.revisar_si_posicion_esta_en_tablero(posicion_variable)==False:
 						posicion_variable=[]
 						print(posicion_variable)
-						posicion_variable+=self.casillas[casilla].posicion
+						posicion_variable+=self.casillas[casilla].casilla
 						print(posicion_variable)
 
 			while self.revisar_si_posicion_esta_en_tablero(posicion_variable)==True and T<100:
@@ -254,11 +253,9 @@ class tablero(object):
 
 
 
-mi_tablero=tablero()
-mi_tablero.agregar_casillas(casillas_nombres,casillas_como_objetos)
-#mi_tablero.mostrar_casillas()
 
-print(mi_tablero.cruz("a1"))
+
+
 
 
 
