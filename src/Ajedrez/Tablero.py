@@ -16,7 +16,9 @@ class Tablero:
     knight_queen = 'knight_queen'
     rook_king = 'rook_king'
     rook_queen = 'rook_queen'
-    pawn = 'pawn'
+    pawns = [f'pawn_{i}' for i in range(1, 9)]
+
+
 
     def __init__(self):
         self.casillas = {(m, n): Casilla(nombre=Tablero.dar_nombre((m, n)),
@@ -37,13 +39,19 @@ class Tablero:
 
         # fichas blancas:
         self.fichas[Tablero.W][Tablero.king] = King(Tablero.W, self.casillas[(5, 1)])
-        self.fichas[Tablero.W][Tablero.rook_king] = Rook(Tablero.W, self.casillas[(1, 1)])
-        self.fichas[Tablero.W][Tablero.rook_queen] = Rook(Tablero.W, self.casillas[(8, 1)])
+        self.fichas[Tablero.W][Tablero.queen] = Queen(Tablero.W, self.casillas[(4, 1)])
+        self.fichas[Tablero.W][Tablero.rook_king] = Rook(Tablero.W, self.casillas[(1, 1)], Tablero.rook_queen)
+        self.fichas[Tablero.W][Tablero.rook_queen] = Rook(Tablero.W, self.casillas[(8, 1)], Tablero.rook_king)
+        self.fichas[Tablero.W][Tablero.bishop_queen] = Bishop(Tablero.W, self.casillas[(3, 1)], Tablero.bishop_queen)
+        self.fichas[Tablero.W][Tablero.bishop_king] = Bishop(Tablero.W, self.casillas[(6, 1)], Tablero.bishop_king)
 
         # fichas negras:
         self.fichas[Tablero.D][Tablero.king] = King(Tablero.D, self.casillas[(5, 8)])
-        self.fichas[Tablero.D][Tablero.rook_king] = Rook(Tablero.D, self.casillas[(1, 8)])
-        self.fichas[Tablero.D][Tablero.rook_queen] = Rook(Tablero.D, self.casillas[(8, 8)])
+        self.fichas[Tablero.D][Tablero.queen] = Queen(Tablero.D, self.casillas[(4, 8)])
+        self.fichas[Tablero.D][Tablero.rook_king] = Rook(Tablero.D, self.casillas[(1, 8)], Tablero.rook_king)
+        self.fichas[Tablero.D][Tablero.rook_queen] = Rook(Tablero.D, self.casillas[(8, 8)], Tablero.rook_queen)
+        self.fichas[Tablero.D][Tablero.bishop_king] = Bishop(Tablero.D, self.casillas[(3, 8)], Tablero.bishop_king)
+        self.fichas[Tablero.D][Tablero.bishop_queen] = Bishop(Tablero.D, self.casillas[(6, 8)], Tablero.bishop_queen)
 
         #se llama una funcion que edita el atributo
         # atacado para cada casilla
@@ -56,6 +64,12 @@ class Tablero:
         for i in [Tablero.W, Tablero.D]:
             for j in self.fichas[i].values():
                 j.informar_a_las_casillas_que_estan_ocupadas()
+
+        for fW, fD in zip(self.fichas[Tablero.W].values(), self.fichas[Tablero.D].values()):
+            fW.lista_posibles_jugadas = fW.posibles_jugadas()
+            fD.lista_posibles_jugadas = fD.posibles_jugadas()
+            fW.lista_atacadas = fW.casillas_atacadas()
+            fD.lista_atacadas = fD.casillas_atacadas()
 
 
     @staticmethod
@@ -142,6 +156,7 @@ class Ficha:
         self.tipo = tipo
         self.valor = valor
         self.lista_posibles_jugadas = self.posibles_jugadas()
+        self.lista_atacadas = self.casillas_atacadas()
 
     def __repr__(self):
         col = "Negro"
@@ -169,6 +184,32 @@ class Ficha:
             The list with the attacked squares.
         """
         ...
+    def dar_rayos_posibles_jugadas(self, direcciones):
+        pos_jug = []
+        for i in direcciones:
+            casilla_variable = self.casilla.cassilla_dir(i)
+            while casilla_variable:
+                if casilla_variable.ocupacion:
+                    if casilla_variable.ocupacion.color != self.color:
+                        pos_jug.append(casilla_variable)
+                    break
+                else:
+                    pos_jug.append(casilla_variable)
+                casilla_variable = casilla_variable.cassilla_dir(i)
+        return pos_jug
+
+    def dar_rayos_ataques(self, direcciones):
+        pos_jug = []
+        for i in direcciones:
+            casilla_variable = self.casilla.cassilla_dir(i)
+            while casilla_variable:
+                if casilla_variable.ocupacion:
+                    pos_jug.append(casilla_variable)
+                    break
+                else:
+                    pos_jug.append(casilla_variable)
+                casilla_variable = casilla_variable.cassilla_dir(i)
+        return pos_jug
 
     def informar_a_las_casillas_que_estan_atacadas(self):
         if self.casillas_atacadas() is not None:
@@ -190,7 +231,7 @@ class Ficha:
 
 class King(Ficha):
     def __init__(self, color, casilla):
-        super().__init__(color, casilla, tipo="king", valor=inf)
+        super().__init__(color, casilla, tipo=Tablero.king, valor=inf)
 
     def posibles_jugadas(self):
         pos_jug = []
@@ -211,97 +252,74 @@ class King(Ficha):
         return cas_ata
 
 
-class Bichop(Ficha):
-    def __init__(self, color, casilla):
-        super().__init__(color, casilla, tipo="rook", valor=5)
+class Bishop(Ficha):
+    def __init__(self, color, casilla, tipo):
+        super().__init__(color, casilla, tipo=tipo, valor=3)
 
     def posibles_jugadas(self):
-        pos_jug = []
-        for i in ["UL","DR","DL","UR"]:
-            casilla_variable = self.casilla.cassilla_dir(i)
-            while casilla_variable and casilla_variable.ocupacion == None:
-                if casilla_variable:
-                    if casilla_variable.ocupacion:
-                        if casilla_variable.ocupacion.color != self.color:
-                            pos_jug.append(casilla_variable)
-                    else:
-                        pos_jug.append(casilla_variable)
-                casilla_variable = casilla_variable.cassilla_dir(i)
-        return pos_jug
+        return self.dar_rayos_posibles_jugadas([Casilla.up_left, Casilla.down_right, Casilla.down_right, Casilla.up_right])
 
     def casillas_atacadas(self):
-        pos_jug = []
-        for i in ["UL","DR","DL","UR"]:
-            casilla_variable = self.casilla.cassilla_dir(i)
-            while casilla_variable and casilla_variable.ocupacion == None:
-                if casilla_variable:
-                    if casilla_variable.ocupacion:
-                            pos_jug.append(casilla_variable)
-                    else:
-                        pos_jug.append(casilla_variable)
-                casilla_variable = casilla_variable.cassilla_dir(i)
-        return pos_jug
+        return self.dar_rayos_ataques([Casilla.up_left, Casilla.down_right, Casilla.down_right, Casilla.up_right])
 
 
 class Rook(Ficha):
-    def __init__(self, color, casilla):
-        super().__init__(color, casilla, tipo="rook", valor=5)
+    def __init__(self, color, casilla, tipo):
+        super().__init__(color, casilla, tipo, valor=5)
 
     def posibles_jugadas(self):
-        pos_jug = []
-        for i in ["U","D","L","R"]:
-            casilla_variable = self.casilla.cassilla_dir(i)
-            while casilla_variable and casilla_variable.ocupacion == None:
-                if casilla_variable:
-                    if casilla_variable.ocupacion:
-                        if casilla_variable.ocupacion.color != self.color:
-                            pos_jug.append(casilla_variable)
-                    else:
-                        pos_jug.append(casilla_variable)
-                casilla_variable = casilla_variable.cassilla_dir(i)
-        return pos_jug
+        return self.dar_rayos_posibles_jugadas([Casilla.up, Casilla.down, Casilla.left, Casilla.right])
 
     def casillas_atacadas(self):
-        pos_jug = []
-        for i in ["U","D","L","R"]:
-            casilla_variable = self.casilla.cassilla_dir(i)
-            while casilla_variable and casilla_variable.ocupacion == None:
-                if casilla_variable:
-                    if casilla_variable.ocupacion:
-                            pos_jug.append(casilla_variable)
-                    else:
-                        pos_jug.append(casilla_variable)
-                casilla_variable = casilla_variable.cassilla_dir(i)
-        return pos_jug
+        return self.dar_rayos_ataques([Casilla.up, Casilla.down, Casilla.left, Casilla.right])
+
 
 class Queen(Ficha):
     def __init__(self, color, casilla):
-        super().__init__(color, casilla, tipo="rook", valor=5)
+        super().__init__(color, casilla, tipo=Tablero.queen, valor=9)
 
     def posibles_jugadas(self):
-        pos_jug = []
-        for i in ["U","D","L","R","UL","DR","DL","UR"]:
-            casilla_variable = self.casilla.cassilla_dir(i)
-            while casilla_variable and casilla_variable.ocupacion == None:
-                if casilla_variable:
-                    if casilla_variable.ocupacion:
-                        if casilla_variable.ocupacion.color != self.color:
-                            pos_jug.append(casilla_variable)
-                    else:
-                        pos_jug.append(casilla_variable)
-                casilla_variable = casilla_variable.cassilla_dir(i)
-        return pos_jug
+         return self.dar_rayos_posibles_jugadas([Casilla.up, Casilla.down, Casilla.left, Casilla.right,
+                  Casilla.up_left, Casilla.down_right, Casilla.down_right, Casilla.up_right])
 
     def casillas_atacadas(self):
-        pos_jug = []
-        for i in ["U","D","L","R","UL","DR","DL","UR"]:
-            casilla_variable = self.casilla.cassilla_dir(i)
-            while casilla_variable and casilla_variable.ocupacion == None:
-                if casilla_variable:
-                    if casilla_variable.ocupacion:
-                            pos_jug.append(casilla_variable)
-                    else:
-                        pos_jug.append(casilla_variable)
-                casilla_variable = casilla_variable.cassilla_dir(i)
-        return pos_jug
+        return self.dar_rayos_ataques([Casilla.up, Casilla.down, Casilla.left, Casilla.right,
+                  Casilla.up_left, Casilla.down_right, Casilla.down_right, Casilla.up_right])
+
+
+class Pawn(Ficha):
+    def __init__(self, color, casilla, tipo):
+            super().__init__(color, casilla, tipo, valor=1)
+
+    def posibles_jugadas(self):
+        if self.color:
+            return [self.casilla.casillas_adyacentes(Casilla.up)]
+        else:
+            return [self.casilla.casillas_adyacentes(Casilla.down)]
+
+    def casillas_atacadas(self):
+        if self.color:
+            return [self.casilla.casillas_adyacentes(Casilla.up_left),elf.casilla.casillas_adyacentes(Casilla.up_right)]
+        else:
+            return [self.casilla.casillas_adyacentes(Casilla.down_left),elf.casilla.casillas_adyacentes(Casilla.down_right)]
+
+
+class Knith():
+    def __init__(self, color, casilla, tipo):
+            super().__init__(color, casilla, tipo,  valor=3)
+
+    def posibles_jugadas(self):
+        if self.color:
+            return [self.casilla.casillas_adyacentes(Casilla.up)]
+        else:
+            return [self.casilla.casillas_adyacentes(Casilla.down)]
+
+    def casillas_atacadas(self):
+        if self.color:
+            return [self.casilla.casillas_adyacentes(Casilla.up_left),elf.casilla.casillas_adyacentes(Casilla.up_right)]
+        else:
+            return [self.casilla.casillas_adyacentes(Casilla.down_left),elf.casilla.casillas_adyacentes(Casilla.down_right)]
+
+
+
 

@@ -28,7 +28,19 @@ class visualizer:
 		return fig, ax
 
 	@staticmethod
-	def piece(piece: Ficha):
+	def piece_attacked(piece: Ficha):
+		image = visualizer.plain_board()
+		for c in piece.lista_atacadas:
+			i, j = c.posicion
+			image[j - 1, i - 1] = 0.7
+
+		i, j = piece.casilla.posicion
+		image[j - 1, i - 1] = 0.3
+
+		visualizer.board(image)
+
+	@staticmethod
+	def piece_possible(piece: Ficha):
 		image = visualizer.plain_board()
 		for c in piece.lista_posibles_jugadas:
 			i, j = c.posicion
