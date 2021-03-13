@@ -5,8 +5,8 @@ from Visual.Visual import visualizer as vis
 
 def test_visual():
     mi_tablero=Tablero()
-    f = mi_tablero.fichas[Tablero.W][Tablero.bishop_queen]
-    vis.piece(f)
+    f = mi_tablero.fichas[Tablero.W][Tablero.rook_queen]
+    vis.piece_attacked(f)
     vis.show()
 
 
