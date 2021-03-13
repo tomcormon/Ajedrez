@@ -44,6 +44,8 @@ class Tablero:
         self.fichas[Tablero.W][Tablero.rook_queen] = Rook(Tablero.W, self.casillas[(8, 1)], Tablero.rook_king)
         self.fichas[Tablero.W][Tablero.bishop_queen] = Bishop(Tablero.W, self.casillas[(3, 1)], Tablero.bishop_queen)
         self.fichas[Tablero.W][Tablero.bishop_king] = Bishop(Tablero.W, self.casillas[(6, 1)], Tablero.bishop_king)
+        self.fichas[Tablero.W][Tablero.knight_king] = Knight(Tablero.W, self.casillas[(7, 1)], Tablero.knight_king)
+        self.fichas[Tablero.W][Tablero.knight_queen] = Knight(Tablero.W, self.casillas[(2, 1)], Tablero.knight_queen)
         for i in range(1,9):
             self.fichas[Tablero.W][Tablero.pawns[i-1]] = Pawn(Tablero.W, self.casillas[(i,2)], Tablero.pawns[i-1])
 
@@ -54,6 +56,8 @@ class Tablero:
         self.fichas[Tablero.D][Tablero.rook_queen] = Rook(Tablero.D, self.casillas[(8, 8)], Tablero.rook_queen)
         self.fichas[Tablero.D][Tablero.bishop_king] = Bishop(Tablero.D, self.casillas[(3, 8)], Tablero.bishop_king)
         self.fichas[Tablero.D][Tablero.bishop_queen] = Bishop(Tablero.D, self.casillas[(6, 8)], Tablero.bishop_queen)
+        self.fichas[Tablero.D][Tablero.knight_king] = Bishop(Tablero.D, self.casillas[(7, 8)], Tablero.knight_king)
+        self.fichas[Tablero.D][Tablero.knight_queen] = Bishop(Tablero.D, self.casillas[(2, 8)], Tablero.knight_queen)
         for i in range(1,9):
             self.fichas[Tablero.D][Tablero.pawns[i-1]] = Pawn(Tablero.D, self.casillas[(i,7)], Tablero.pawns[i-1])
 
@@ -322,23 +326,47 @@ class Pawn(Ficha):
         return cas_ata
 
 
-'''
-class Knight():
+class Knight(Ficha):
     def __init__(self, color, casilla, tipo):
-            super().__init__(color, casilla, tipo,  valor=3)
+            super().__init__(color, casilla, tipo, valor=1)
 
     def posibles_jugadas(self):
-        if self.color:
-            return [self.casilla.casillas_adyacentes(Casilla.up)]
-        else:
-            return [self.casilla.casillas_adyacentes(Casilla.down)]
+        pos_jug = []
+        for i in [Casilla.up, Casilla.down]:
+           for j in [Casilla.right, Casilla.left]:
+                if i != j:
+                     if self.casilla.casilla_dir(i):
+                         if self.casilla.casilla_dir(i).casilla_dir(i):
+                             if self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j):
+                                pos_jug.append(self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j))
+        for i in [Casilla.right, Casilla.left]:
+           for j in [Casilla.up, Casilla.down]:
+                if i != j:
+                     if self.casilla.casilla_dir(i):
+                         if self.casilla.casilla_dir(i).casilla_dir(i):
+                             if self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j):
+                                pos_jug.append(self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j))
+        return pos_jug
 
     def casillas_atacadas(self):
-        if self.color:
-            return [self.casilla.casillas_adyacentes(Casilla.up_left),elf.casilla.casillas_adyacentes(Casilla.up_right)]
-        else:
-            return [self.casilla.casillas_adyacentes(Casilla.down_left),elf.casilla.casillas_adyacentes(Casilla.down_right)]
-'''
+        pos_jug = []
+        for i in [Casilla.up, Casilla.down]:
+           for j in [Casilla.right, Casilla.left]:
+                     if self.casilla.casilla_dir(i):
+                         if self.casilla.casilla_dir(i).casilla_dir(i):
+                             if self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j):
+                                if self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j).ocupacion == None :
+                                    pos_jug.append(self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j))
+
+        for i in [Casilla.right, Casilla.left]:
+           for j in [Casilla.up, Casilla.down]:
+                     if self.casilla.casilla_dir(i):
+                         if self.casilla.casilla_dir(i).casilla_dir(i):
+                             if self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j):
+                                 if self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j).ocupacion == None:
+                                    pos_jug.append(self.casilla.casilla_dir(i).casilla_dir(i).casilla_dir(j))
+
+        return pos_jug
 
 
 
