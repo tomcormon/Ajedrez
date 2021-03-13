@@ -6,7 +6,9 @@ from Visual.Visual import visualizer as vis
 def test_visual():
     mi_tablero=Tablero()
     f = mi_tablero.fichas[Tablero.W][Tablero.rook_queen]
-    vis.piece_attacked(f)
+    # mi_tablero.mostrar_casillas()
+    vis.piece_reach(f, f.lista_posibles_jugadas)
+    # vis.filled_board(mi_tablero)
     vis.show()
 
 

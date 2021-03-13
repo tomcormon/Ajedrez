@@ -18,8 +18,6 @@ class Tablero:
     rook_queen = 'rook_queen'
     pawns = [f'pawn_{i}' for i in range(1, 9)]
 
-
-
     def __init__(self):
         self.casillas = {(m, n): Casilla(nombre=Tablero.dar_nombre((m, n)),
                                          posicion=(m, n),
@@ -157,6 +155,7 @@ class Ficha:
         self.valor = valor
         self.lista_posibles_jugadas = self.posibles_jugadas()
         self.lista_atacadas = self.casillas_atacadas()
+        self.image = None
 
     def __repr__(self):
         col = "Negro"
@@ -184,6 +183,7 @@ class Ficha:
             The list with the attacked squares.
         """
         ...
+
     def dar_rayos_posibles_jugadas(self, direcciones):
         pos_jug = []
         for i in direcciones:
@@ -232,6 +232,8 @@ class Ficha:
 class King(Ficha):
     def __init__(self, color, casilla):
         super().__init__(color, casilla, tipo=Tablero.king, valor=inf)
+        c = 'w' if self.color else 'd'
+        self.image = f'figures/{c}_king.png'
 
     def posibles_jugadas(self):
         pos_jug = []
@@ -255,6 +257,8 @@ class King(Ficha):
 class Bishop(Ficha):
     def __init__(self, color, casilla, tipo):
         super().__init__(color, casilla, tipo=tipo, valor=3)
+        c = 'w' if self.color else 'd'
+        self.image = f'figures/{c}_bishop.png'
 
     def posibles_jugadas(self):
         return self.dar_rayos_posibles_jugadas([Casilla.up_left, Casilla.down_right, Casilla.down_right, Casilla.up_right])
@@ -266,6 +270,8 @@ class Bishop(Ficha):
 class Rook(Ficha):
     def __init__(self, color, casilla, tipo):
         super().__init__(color, casilla, tipo, valor=5)
+        c = 'w' if self.color else 'd'
+        self.image = f'figures/{c}_rook.png'
 
     def posibles_jugadas(self):
         return self.dar_rayos_posibles_jugadas([Casilla.up, Casilla.down, Casilla.left, Casilla.right])
@@ -277,6 +283,8 @@ class Rook(Ficha):
 class Queen(Ficha):
     def __init__(self, color, casilla):
         super().__init__(color, casilla, tipo=Tablero.queen, valor=9)
+        c = 'w' if self.color else 'd'
+        self.image = f'figures/{c}_queen.png'
 
     def posibles_jugadas(self):
          return self.dar_rayos_posibles_jugadas([Casilla.up, Casilla.down, Casilla.left, Casilla.right,
@@ -289,7 +297,9 @@ class Queen(Ficha):
 
 class Pawn(Ficha):
     def __init__(self, color, casilla, tipo):
-            super().__init__(color, casilla, tipo, valor=1)
+        super().__init__(color, casilla, tipo, valor=1)
+        c = 'w' if self.color else 'd'
+        self.image = f'figures/{c}_pawn.png'
 
     def posibles_jugadas(self):
         if self.color:
@@ -306,7 +316,9 @@ class Pawn(Ficha):
 
 class Knith():
     def __init__(self, color, casilla, tipo):
-            super().__init__(color, casilla, tipo,  valor=3)
+        super().__init__(color, casilla, tipo,  valor=3)
+        c = 'w' if self.color else 'd'
+        self.image = f'figures/{c}_knight.png'
 
     def posibles_jugadas(self):
         if self.color:
